@@ -40,20 +40,8 @@ class Diceware:
                 key, value = pair.split("\t")
                 self.passwords[key] = value
                 
-                
-    def main(self):
-        
-        while True:
-            
-            _input = input(">>> ")
-            
-            if _input == "exit":
-                break
-            elif _input.startswith("g"):
-                print(self.generate(4, " "))
-
 
 if __name__ == "__main__":
     dw = Diceware()
-    p = dw.generate(4, " ")
+    p = dw.generate(5, " ")
     print(p)
