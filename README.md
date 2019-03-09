@@ -1,7 +1,7 @@
 # Diceware
 An implementation of Diceware password generation.
 
-I learned about Diceware from this Computerphile video
+I learned about Diceware from this [Computerphile](https://www.youtube.com/channel/UC9-y-6csu5WGm29I7JiwpnA) video:
 
 [![Diceware & Passwords - Computerphile](https://img.youtube.com/vi/Pe_3cFuSw1E/0.jpg)](https://www.youtube.com/watch?v=Pe_3cFuSw1E "Diceware & Passwords - Computerphile")
 
