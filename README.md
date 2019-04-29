@@ -7,6 +7,9 @@ I learned about Diceware from this [Computerphile](https://www.youtube.com/chann
 
 [Here](http://world.std.com/~reinhold/diceware.html) is the Diceware Passphrase Home Page.
 
+### Usage
+This program will generate a report (see an example: `report.txt`)
+
 ### Interesting Resources on Password Entropy
 1. http://www.shannonentropy.netmark.pl/
 2. http://world.std.com/~reinhold/dicewarefaq.html

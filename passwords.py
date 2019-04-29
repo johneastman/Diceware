@@ -26,30 +26,50 @@ import secrets
 import time
 import argparse
 
+from check_password import check_password
+
 class Diceware:
 
     def __init__(self, args):
 
+        # Arguments from argparse
         self.num_words = args.n
         self.delimiter = args.d
-        self.add_char  = args.c
+        self.passphrase = args.c if len(args.c) > 0 else ""
+
+        self.report_name = "report.txt"
 
         self.passwords = {}
 
-        # For added security, rolling two more digits allow for adding
-        # one of the following characters into the passphrase.
-        self.character_table = ["~", "!", "#", "$", "%", "^",
-                                "&", "*", "(", ")", "-", "=",
-                                "+", "[", "]", "\\", "{", "}",
-                                ":", ";" "<", ">", "?", "/",
-                                "0", "1", "2", "3", "4", "5",
-                                "6", "7", "8", "9"]
-
         self.load()
 
+    def check_pwned(self, passphrase):
+        """Returns a formatted sentence stating the number of times a password
+        was found to have been leaked (see 'check_password.py' for more info).
+        """
+        results = check_password(passphrase)
+        num_times = results[0][1] if len(results) > 0 else "0"
+        return f"'{passphrase}' was found {num_times} times elsewhere"
 
     def generate(self):
-        """Generate the passphrase.
+        """Generate info about a passphrase.
+
+        If 'self.passphrase' is an empty string, generate a password and check
+        if it has been pwned. Otherwise, just check if 'self.passphrase' has
+        been pwned.
+        """
+        if len(self.passphrase) > 0:
+            # Only check if a password has been pwned.
+            text = self.check_pwned(self.passphrase)
+        else:
+            # Generate password and check if that password has been pwned.
+            passphrase = self.generate_passphrase()
+            pwned_message = self.check_pwned(passphrase)
+            text = f"Your new passphrase: {passphrase}\n{pwned_message}"
+        self.generate_report(text)
+
+    def generate_passphrase(self):
+        """Generate a passphrase.
 
         This passphrase will have 'self.num_words' words in it, delimited by
         'self.delimiter'.
@@ -62,49 +82,24 @@ class Diceware:
             words.append(self.passwords[key])
 
         # Join each word in 'words' together, delimited by 'delimiter'
-        passphrase = self.delimiter.join(words)
+        return self.delimiter.join(words)
 
-        if self.add_char:
-            # If the user chooses to add a random character in their passphrase,
-            # Select a random character from the generated passphrase and replace
-            # that character with a randomly-selected character from
-            # 'self.character_table'
-            passphrase = list(passphrase)
-            index = secrets.randbelow(len(passphrase))
-            passphrase[index] = self.get_special_character()
-            passphrase = "".join(passphrase)
-
-        return passphrase
-
-
-    def get_special_character(self):
-        """Return a character from 'self.character_table'."""
-        return secrets.choice(self.character_table)
-
+    def generate_report(self, text):
+        """Generate a report on a generated/given password."""
+        with open(self.report_name, "w") as file:
+            file.write(text)
 
     def load(self):
-        """Load password, die-roll pairs from "diceware.wordlist.asc".
+        """Load password, die-roll pairs from "diceware.txt".
 
         Passphrases and associated die-rolls are put in 'self.passwords'.
         """
         with open("diceware.txt", "r") as file:
-
             data = [line.strip().split(" ") for line in file.readlines()]
-            self.passwords = {key:value for (key, value) in data}
-
-
-    def show_stats(self):
-
-        entropy = 12.9 * self.num_words
-
-        if self.add_char:
-            entropy += 10
-
-        print(f"Diceware Method = {entropy} bits")
+        self.passwords = {key:value for (key, value) in data}
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description="Generating random passwords")
 
     parser.add_argument("-n", type=int, default=5,
@@ -113,15 +108,10 @@ if __name__ == "__main__":
     parser.add_argument("-d", type=str, default=" ",
                         help="The delimiter that goes between each word")
 
-    parser.add_argument("-c", action='store_true',
-                        help="A special character should be inserted in the passphrase")
-
-    parser.add_argument("-s", action='store_true',
-                        help="Show stats about your generated password")
+    parser.add_argument("-c", type=str, default="",
+                        help="Check if a password has been leaked via the Pwned Passwords api")
 
     args = parser.parse_args()
 
     dw = Diceware(args)
-    p = dw.generate()
-    print(p)
-    dw.show_stats()
+    dw.generate()
