@@ -1,5 +1,5 @@
 # Diceware
-This is an implementation of the Diceware password generation methodology. This process involves rolling a die six times to generate a six-digit identifier, which is paired with a word in [diceware.txt](https://github.com/johneastman/Diceware/blob/master/diceware.txt). After completing this process any amount of times, the generated words are join together and separated by a delimiter ([Source](http://world.std.com/~reinhold/diceware.html)).
+This is an implementation of the Diceware password generation methodology. This process involves rolling a six-sided die six times to generate a six-digit identifier, which is paired with a word in [diceware.txt](https://github.com/johneastman/Diceware/blob/master/diceware.txt). After completing this process five, the generated words are join together and separated by a delimiter ([source](http://world.std.com/~reinhold/diceware.html)).
 
 I learned about Diceware from this Computerphile video (check out their channel [here](https://www.youtube.com/channel/UC9-y-6csu5WGm29I7JiwpnA)):
 
