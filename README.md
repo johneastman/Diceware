@@ -16,4 +16,25 @@ This program is a simple command-line tool that has the following options:
 | -d | Delimiter character (defaults to space). |
 | -c | Check if a given passphrase has been leaked. If no passphrase is provided, the generated password will be checked. This feature is provided by the [Pwned Passwords API](https://haveibeenpwned.com/Passwords). |
 
+To generate a passphrase, use:
+```
+python password.py
+```
+
+To change the number of words used to generate the passphrase, use:
+```
+python password.py -n 7
+```
+
+To change the delimiting character, use:
+```
+python password.py -d @
+```
+
+Finally, to check if `password1`, for example, been leaked, use:
+```
+python password.py -c password1
+```
+
+## Output
 This program will generate a report (see an example: `report.txt`) that contains the password and the number of times (if any) the specified password was found elsewhere online.
