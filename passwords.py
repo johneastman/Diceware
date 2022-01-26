@@ -23,10 +23,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import secrets
-import time
 import argparse
 
 from check_password import check_password
+
 
 class Diceware:
 

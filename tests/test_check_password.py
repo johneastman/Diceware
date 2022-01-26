@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import patch
 import string
-import random
 
 import requests
 
