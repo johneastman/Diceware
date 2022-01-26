@@ -41,11 +41,15 @@ def check_password(password_text):
     first, rest = password_hash[:5], password_hash[5:]
 
     # Retrieve all hashes that start with the characters in 'first'. The remaining
-    # characters in the hashes are returned
-    response_body = get_response_body(f"https://api.pwnedpasswords.com/range/{first}")
+    # characters in the hashes are returned by the endpoint
+    url = f"https://api.pwnedpasswords.com/range/{first}"
+    response = requests.get(url)
+    if response.status_code != 200:
+        raise Exception(f"URL: {url}; Status Code: {response.status_code}; Body: {response.text}")
 
     # Each hash-occurrence pair is on a new line, so split the string into a list where each element is a separate line
-    hash_occurrences = list(filter(lambda l: len(l) == 2, [result.rstrip().split(":") for result in response_body.split("\n")]))
+    hash_occurrences = filter(lambda l: len(l) == 2,
+                              [result.rstrip().split(":") for result in response.text.split("\n")])
 
     # Create a dictionary matching all the hashes with their occurrences
     results = {rest_hash: int(occurrence) for rest_hash, occurrence in hash_occurrences}
@@ -59,15 +63,6 @@ def get_password_hash(password):
     return hashlib.sha1(password.encode()).hexdigest().upper()
 
 
-def get_response_body(url):
-    response = requests.get(url)
-    if response.status_code != 200:
-        raise Exception(f"URL: {url}; Status Code: {response.status_code}; Body: {response.text}")
-    return response.text
-
-
 if __name__ == "__main__":
-    # Example of how this function can be used
-    password = "password"
-    num_occurrences = check_password(password)
+    num_occurrences = check_password("password")
     print(num_occurrences)

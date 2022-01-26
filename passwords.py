@@ -96,7 +96,7 @@ class Diceware:
         """
         with open("diceware.txt", "r") as file:
             data = [line.strip().split(" ") for line in file.readlines()]
-        self.passwords = {key:value for (key, value) in data}
+        self.passwords = {key: value for (key, value) in data}
 
 
 if __name__ == "__main__":
