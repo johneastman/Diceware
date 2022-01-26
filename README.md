@@ -1,4 +1,6 @@
 # Diceware
+
+## Background
 This is an implementation of the Diceware password generation methodology. This process involves rolling a six-sided die six times to generate a six-digit identifier, which is paired with a word in [diceware.txt](https://github.com/johneastman/Diceware/blob/master/diceware.txt). After completing this process five, the generated words are join together and separated by a delimiter ([source](http://world.std.com/~reinhold/diceware.html)).
 
 I learned about Diceware from this Computerphile video (check out their channel [here](https://www.youtube.com/channel/UC9-y-6csu5WGm29I7JiwpnA)):
@@ -8,7 +10,7 @@ I learned about Diceware from this Computerphile video (check out their channel 
 [Here](http://world.std.com/~reinhold/diceware.html) is the Diceware Passphrase Home Page.
 
 ## Usage
-This program is a simple command-line tool that has the following options:
+This program is a simple command-line tool that supports the following options:
 
 | Command | Description |
 |:-------:|:------------|
@@ -37,4 +39,4 @@ python password.py -c password1
 ```
 
 ## Output
-This program will generate a report (see an example: `report.txt`) that contains the password and the number of times (if any) the specified password was found elsewhere online.
+This program will generate a report in `report.txt`. That report contains the generated password, as well as checking if the generated password was ever found in any data breaches or leaks. This check is done with the [Pwned Passwords](https://haveibeenpwned.com/Passwords) API.

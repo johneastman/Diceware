@@ -25,44 +25,49 @@ SOFTWARE.
 import requests
 import hashlib
 
+
 def check_password(password_text):
     """Check whether a password has been leaked.
 
     Passwords are checked using the haveibeenpwned password api:
     https://haveibeenpwned.com/Passwords
     """
-    # Retrieve a hash of the password using SHA-1
-    password_hash = hashlib.sha1(password_text.encode()).hexdigest().upper()
+    # Retrieve a hash of the password text using SHA-1
+    password_hash = get_password_hash(password_text)
 
     # first: first 5 characters to be sent to the api for checking.
     # rest:  The remaining characters in the hash, which are checked to see if the
     #        password has been found elsewhere.
     first, rest = password_hash[:5], password_hash[5:]
 
-    url = f"https://api.pwnedpasswords.com/range/{first}"
-
     # Retrieve all hashes that start with the characters in 'first'. The remaining
     # characters in the hashes are returned
+    response_body = get_response_body(f"https://api.pwnedpasswords.com/range/{first}")
+
+    # Each hash-occurrence pair is on a new line, so split the string into a list where each element is a separate line
+    hash_occurrences = list(filter(lambda l: len(l) == 2, [result.rstrip().split(":") for result in response_body.split("\n")]))
+
+    # Create a dictionary matching all the hashes with their occurrences
+    results = {rest_hash: int(occurrence) for rest_hash, occurrence in hash_occurrences}
+
+    # Return the number of occurrences associated with the hash from the given password. If that hash is not in the
+    # dictionary, return 0
+    return results.get(rest, 0)
+
+
+def get_password_hash(password):
+    return hashlib.sha1(password.encode()).hexdigest().upper()
+
+
+def get_response_body(url):
     response = requests.get(url)
+    if response.status_code != 200:
+        raise Exception(f"URL: {url}; Status Code: {response.status_code}; Body: {response.text}")
+    return response.text
 
-    # Put each hash and the number of times found in a list, and retrieve
-    # the hash-frequency pairs matching the 'rest' hash
-    results = [result.rstrip() for result in response.text.split("\n")]
-    results = [result.split(":") for result in results]
-    results = [result for result in results if result[0] == rest]
-
-    # Return the hash-frequency pairs
-    return results
 
 if __name__ == "__main__":
     # Example of how this function can be used
-    password = "wgouhaliwbeigubeaiuhb"
-    results = check_password(password)
-
-    '''
-    if len(results) == 0:
-        print(f"'{password}' was not found")
-    else:
-        for _, num_appearances in results:
-            print(f"'{password}' was found {num_appearances} times")
-    '''
+    password = "password"
+    num_occurrences = check_password(password)
+    print(num_occurrences)
