@@ -22,8 +22,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-import secrets
 import argparse
+import json
+import os
+import re
+import requests
+import secrets
 
 from check_password import check_password
 
@@ -42,7 +46,7 @@ def generate_passphrase(num_words, delimiter):
     :return: the generated passphrase
     :rtype: str
     """
-    passwords = get_passwords("diceware.txt")
+    passwords = get_passwords()
 
     words = []
     for _ in range(num_words):
@@ -56,14 +60,30 @@ def generate_passphrase(num_words, delimiter):
     return delimiter.join(words)
 
 
-def get_passwords(filename):
+def get_passwords():
     """Load password, die-roll pairs from the given file.
 
     Passphrases and associated die-rolls are put in 'self.passwords'.
     """
-    with open(filename, "r") as file:
-        data = [line.strip().split(" ") for line in file.readlines()]
-    return {key: value for (key, value) in data}
+    file_path = os.path.join(os.path.dirname(__file__), "words.json")
+
+    if os.path.exists(file_path):
+        print("Loading words from local file...")
+        with open(file_path, "r") as file:
+            data = json.load(file)
+        return data
+
+    print("Retrieving words from the web...")
+    response = requests.get("https://theworld.com/%7Ereinhold/diceware.wordlist.asc")
+    if response.status_code != 200:
+        raise Exception("Failed to retrieve diceware word list.")
+    lines = response.text.splitlines()
+    words = [line.strip().split() for line in lines if re.search("^\\d{5}", line)]
+
+    data = {key: value for (key, value) in words}
+    with open(file_path, "w") as file:
+        json.dump(data, file, indent=4)
+    return data
 
 
 def setup_parser():
